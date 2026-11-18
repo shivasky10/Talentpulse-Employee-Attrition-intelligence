@@ -3,25 +3,24 @@ import pandas as pd
 import joblib
 from pathlib import Path
 
-# -----------------------------------
-# 1. Page Configuration
-# -----------------------------------
+# 1. PAGE CONFIGURATION
+
 
 st.set_page_config(
-    page_title="TalentPulse | Attrition Prediction",
+    page_title="TalentPulse | Employee Attrition Intelligence",
     page_icon="📊",
     layout="wide"
 )
 
-# -----------------------------------
-# 2. Load Trained Model
-# -----------------------------------
+# 2. LOAD TRAINED MODEL
 
 MODEL_PATH = Path(__file__).parent / "models" / "talentpulse_xgboost.pkl"
+
 
 @st.cache_resource
 def load_model():
     return joblib.load(MODEL_PATH)
+
 
 try:
     model = load_model()
@@ -29,37 +28,85 @@ except Exception as e:
     st.error(f"Unable to load model: {e}")
     st.stop()
 
-# -----------------------------------
-# 3. Application Header
-# -----------------------------------
+
+# =====================================================
+# 3. IBM DATASET VALUE MAPPINGS
+# =====================================================
+
+education_options = {
+    "Below College": 1,
+    "College": 2,
+    "Bachelor": 3,
+    "Master": 4,
+    "Doctor": 5
+}
+
+satisfaction_options = {
+    "Low": 1,
+    "Medium": 2,
+    "High": 3,
+    "Very High": 4
+}
+
+work_life_options = {
+    "Bad": 1,
+    "Good": 2,
+    "Better": 3,
+    "Best": 4
+}
+
+performance_options = {
+    "Excellent": 3,
+    "Outstanding": 4
+}
+
+
+# =====================================================
+# 4. APPLICATION HEADER
+# =====================================================
 
 st.title("📊 TalentPulse")
-st.subheader("Employee Attrition Prediction & Workforce Analytics")
+st.subheader("Employee Attrition Intelligence")
 
-st.markdown("""
-TalentPulse uses Machine Learning to estimate employee attrition risk
-based on employee demographics, job characteristics and work experience.
+st.markdown(
+    """
+    **Turning Workforce Data into Predictive Insights**
 
-Enter employee information below to generate a prediction.
-""")
+    TalentPulse uses Machine Learning to estimate employee attrition
+    probability based on employee demographics, job characteristics,
+    compensation and work experience.
+
+    Enter employee information below to generate a prediction.
+    """
+)
 
 st.divider()
 
-# -----------------------------------
-# 4. Employee Input Form
-# -----------------------------------
+
+# =====================================================
+# 5. EMPLOYEE INPUT FORM
+# =====================================================
 
 with st.form("employee_form"):
 
-    st.subheader("Employee Information")
+    st.header("Employee Information")
+
+    # -------------------------------------------------
+    # PERSONAL DETAILS
+    # -------------------------------------------------
+
+    st.subheader("👤 Personal Details")
 
     col1, col2, col3 = st.columns(3)
 
-    # Demographics
     with col1:
-        st.markdown("### Personal Details")
 
-        Age = st.number_input("Age", 18, 60, 30)
+        Age = st.number_input(
+            "Age",
+            min_value=18,
+            max_value=60,
+            value=30
+        )
 
         Gender = st.selectbox(
             "Gender",
@@ -71,10 +118,14 @@ with st.form("employee_form"):
             ["Single", "Married", "Divorced"]
         )
 
-        Education = st.selectbox(
-            "Education",
-            [1, 2, 3, 4, 5]
-        )
+    with col2:
+
+        Education = education_options[
+            st.selectbox(
+                "Education",
+                list(education_options.keys())
+            )
+        ]
 
         EducationField = st.selectbox(
             "Education Field",
@@ -88,14 +139,26 @@ with st.form("employee_form"):
             ]
         )
 
+    with col3:
+
         DistanceFromHome = st.number_input(
             "Distance From Home",
-            1, 29, 5
+            min_value=1,
+            max_value=29,
+            value=5
         )
 
-    # Job Details
-    with col2:
-        st.markdown("### Job Details")
+    st.divider()
+
+    # -------------------------------------------------
+    # JOB DETAILS
+    # -------------------------------------------------
+
+    st.subheader("💼 Job Details")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
 
         Department = st.selectbox(
             "Department",
@@ -130,90 +193,137 @@ with st.form("employee_form"):
             ]
         )
 
+    with col2:
+
         JobLevel = st.selectbox(
             "Job Level",
             [1, 2, 3, 4, 5]
         )
 
-        JobInvolvement = st.selectbox(
-            "Job Involvement",
-            [1, 2, 3, 4]
-        )
+        JobInvolvement = satisfaction_options[
+            st.selectbox(
+                "Job Involvement",
+                list(satisfaction_options.keys())
+            )
+        ]
 
-        JobSatisfaction = st.selectbox(
-            "Job Satisfaction",
-            [1, 2, 3, 4]
-        )
-
-        EnvironmentSatisfaction = st.selectbox(
-            "Environment Satisfaction",
-            [1, 2, 3, 4]
-        )
-
-    # Salary and Experience
     with col3:
-        st.markdown("### Salary & Experience")
+
+        JobSatisfaction = satisfaction_options[
+            st.selectbox(
+                "Job Satisfaction",
+                list(satisfaction_options.keys())
+            )
+        ]
+
+        EnvironmentSatisfaction = satisfaction_options[
+            st.selectbox(
+                "Environment Satisfaction",
+                list(satisfaction_options.keys())
+            )
+        ]
+
+    st.divider()
+
+    # -------------------------------------------------
+    # SALARY AND EXPERIENCE
+    # -------------------------------------------------
+
+    st.subheader("💰 Salary & Work Experience")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
 
         MonthlyIncome = st.number_input(
             "Monthly Income",
-            1009, 19999, 5000
+            min_value=1009,
+            max_value=19999,
+            value=5000
         )
 
         MonthlyRate = st.number_input(
             "Monthly Rate",
-            2094, 26999, 14000
+            min_value=2094,
+            max_value=26999,
+            value=14000
         )
 
         DailyRate = st.number_input(
             "Daily Rate",
-            102, 1499, 800
+            min_value=102,
+            max_value=1499,
+            value=800
         )
 
         HourlyRate = st.number_input(
             "Hourly Rate",
-            30, 100, 65
+            min_value=30,
+            max_value=100,
+            value=65
         )
+
+    with col2:
 
         TotalWorkingYears = st.number_input(
             "Total Working Years",
-            0, 40, 8
+            min_value=0,
+            max_value=40,
+            value=8
         )
 
         YearsAtCompany = st.number_input(
             "Years At Company",
-            0, 40, 5
+            min_value=0,
+            max_value=40,
+            value=5
         )
 
         YearsInCurrentRole = st.number_input(
             "Years In Current Role",
-            0, 18, 3
+            min_value=0,
+            max_value=18,
+            value=3
         )
+
+    with col3:
 
         YearsWithCurrManager = st.number_input(
             "Years With Current Manager",
-            0, 17, 3
+            min_value=0,
+            max_value=17,
+            value=3
         )
 
         YearsSinceLastPromotion = st.number_input(
             "Years Since Last Promotion",
-            0, 15, 1
+            min_value=0,
+            max_value=15,
+            value=1
+        )
+
+        NumCompaniesWorked = st.number_input(
+            "Previous Companies Worked",
+            min_value=0,
+            max_value=9,
+            value=2
         )
 
     st.divider()
 
-    st.subheader("Additional Work Information")
+    # -------------------------------------------------
+    # ADDITIONAL WORK INFORMATION
+    # -------------------------------------------------
 
-    col4, col5, col6 = st.columns(3)
+    st.subheader("📈 Additional Work Information")
 
-    with col4:
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+
         OverTime = st.selectbox(
-            "OverTime",
+            "Overtime",
             ["Yes", "No"]
-        )
-
-        NumCompaniesWorked = st.number_input(
-            "Number of Previous Companies",
-            0, 9, 2
         )
 
         StockOptionLevel = st.selectbox(
@@ -221,45 +331,96 @@ with st.form("employee_form"):
             [0, 1, 2, 3]
         )
 
-    with col5:
+    with col2:
+
         PercentSalaryHike = st.number_input(
             "Percent Salary Hike",
-            11, 25, 15
+            min_value=11,
+            max_value=25,
+            value=15
         )
 
-        PerformanceRating = st.selectbox(
-            "Performance Rating",
-            [3, 4]
-        )
+        PerformanceRating = performance_options[
+            st.selectbox(
+                "Performance Rating",
+                list(performance_options.keys())
+            )
+        ]
 
-        RelationshipSatisfaction = st.selectbox(
-            "Relationship Satisfaction",
-            [1, 2, 3, 4]
-        )
+    with col3:
 
-    with col6:
+        RelationshipSatisfaction = satisfaction_options[
+            st.selectbox(
+                "Relationship Satisfaction",
+                list(satisfaction_options.keys())
+            )
+        ]
+
         TrainingTimesLastYear = st.number_input(
             "Training Times Last Year",
-            0, 6, 3
+            min_value=0,
+            max_value=6,
+            value=3
         )
 
-        WorkLifeBalance = st.selectbox(
-            "Work Life Balance",
-            [1, 2, 3, 4]
-        )
+        WorkLifeBalance = work_life_options[
+            st.selectbox(
+                "Work Life Balance",
+                list(work_life_options.keys())
+            )
+        ]
+
+    st.divider()
 
     submitted = st.form_submit_button(
-        "Predict Employee Attrition",
-        use_container_width=True
+        "🔍 Predict Employee Attrition",
+        use_container_width=True,
+        type="primary"
     )
 
-# -----------------------------------
-# 5. Prediction
-# -----------------------------------
+
+# =====================================================
+# 6. INPUT VALIDATION
+# =====================================================
 
 if submitted:
 
+    validation_errors = []
+
+    if YearsAtCompany > TotalWorkingYears:
+        validation_errors.append(
+            "Years at company cannot exceed total working years."
+        )
+
+    if YearsInCurrentRole > YearsAtCompany:
+        validation_errors.append(
+            "Years in current role cannot exceed years at company."
+        )
+
+    if YearsWithCurrManager > YearsAtCompany:
+        validation_errors.append(
+            "Years with current manager cannot exceed years at company."
+        )
+
+    if YearsSinceLastPromotion > YearsAtCompany:
+        validation_errors.append(
+            "Years since last promotion cannot exceed years at company."
+        )
+
+    if validation_errors:
+
+        for error in validation_errors:
+            st.error(error)
+
+        st.stop()
+
+
+    # =================================================
+    # 7. CREATE EMPLOYEE DATAFRAME
+    # =================================================
+
     employee_data = pd.DataFrame([{
+
         "Age": Age,
         "BusinessTravel": BusinessTravel,
         "DailyRate": DailyRate,
@@ -290,7 +451,53 @@ if submitted:
         "YearsInCurrentRole": YearsInCurrentRole,
         "YearsSinceLastPromotion": YearsSinceLastPromotion,
         "YearsWithCurrManager": YearsWithCurrManager
+
     }])
+
+
+    # =================================================
+    # 8. ENSURE CORRECT FEATURE ORDER
+    # =================================================
+
+    expected_features = [
+        "Age",
+        "BusinessTravel",
+        "DailyRate",
+        "Department",
+        "DistanceFromHome",
+        "Education",
+        "EducationField",
+        "EnvironmentSatisfaction",
+        "Gender",
+        "HourlyRate",
+        "JobInvolvement",
+        "JobLevel",
+        "JobRole",
+        "JobSatisfaction",
+        "MaritalStatus",
+        "MonthlyIncome",
+        "MonthlyRate",
+        "NumCompaniesWorked",
+        "OverTime",
+        "PercentSalaryHike",
+        "PerformanceRating",
+        "RelationshipSatisfaction",
+        "StockOptionLevel",
+        "TotalWorkingYears",
+        "TrainingTimesLastYear",
+        "WorkLifeBalance",
+        "YearsAtCompany",
+        "YearsInCurrentRole",
+        "YearsSinceLastPromotion",
+        "YearsWithCurrManager"
+    ]
+
+    employee_data = employee_data[expected_features]
+
+
+    # =================================================
+    # 9. MODEL PREDICTION
+    # =================================================
 
     try:
 
@@ -304,17 +511,26 @@ if submitted:
             list(classes).index(1)
         ]
 
+
+        # =============================================
+        # DISPLAY RESULTS
+        # =============================================
+
         st.divider()
-        st.subheader("Prediction Results")
+
+        st.header("Prediction Results")
 
         col1, col2 = st.columns(2)
 
         with col1:
 
             if prediction == 1:
-                st.error("⚠️ Predicted Attrition: Yes")
+
+                st.error("⚠️ Predicted Attrition: YES")
+
             else:
-                st.success("✅ Predicted Attrition: No")
+
+                st.success("✅ Predicted Attrition: NO")
 
         with col2:
 
@@ -323,14 +539,33 @@ if submitted:
                 f"{yes_probability * 100:.2f}%"
             )
 
+
+        # =============================================
+        # PROBABILITY VISUALIZATION
+        # =============================================
+
+        st.subheader("Attrition Probability")
+
         st.progress(float(yes_probability))
 
-        st.info("""
-        This prediction is based on patterns learned from historical
-        employee data. It is an estimate, not a guarantee of future
-        employee behaviour. It should not be used as the sole basis
-        for employment decisions.
-        """)
+        st.caption(
+            f"Estimated probability: {yes_probability * 100:.2f}%"
+        )
+
+
+        # =============================================
+        # EMPLOYEE INPUT SUMMARY
+        # =============================================
+
+        with st.expander("View Submitted Employee Information"):
+
+            st.dataframe(
+                employee_data.T.rename(
+                    columns={0: "Employee Information"}
+                ),
+                use_container_width=True
+            )
+
 
     except Exception as e:
 
