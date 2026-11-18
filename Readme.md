@@ -8,7 +8,6 @@ The project combines data analysis, statistical exploration, feature engineering
 
 The objective is to help HR teams understand workforce trends, identify potential retention risks, and make more informed, data-driven decisions.
 
-> **Note:** This project uses the publicly available IBM HR Analytics Employee Attrition & Performance dataset for educational and portfolio purposes. It does not use actual company employee records.
 
 ---
 
@@ -376,10 +375,10 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-The application will be available locally at:
+The application will be available at:
 
 ```text
-http://localhost:8501
+https://talentpulse-employee-attrition-hrintelligence.streamlit.app/
 ```
 
 ---
