@@ -377,9 +377,9 @@ streamlit run app.py
 
 The application will be available at:
 
-```text
-https://talentpulse-employee-attrition-hrintelligence.streamlit.app/
-```
+
+[visit TalentPulse](https://talentpulse-employee-attrition-hrintelligence.streamlit.app/)
+
 
 ---
 
